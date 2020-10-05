@@ -11,9 +11,7 @@ def convert_images_to_webm(images):
         # only resize if mp3 cover is too big
         if '[FLAC]' not in name and name[-5:] == 'cover' and img.size[0] > max_width:
             print(f"{'Resizing ':10}{image_path}")
-            factor = (max_width / float(img.size[0]))
-            height = int((float(img.size[1]) * float(factor)))
-            img = img.resize((max_width, height), resample=Image.LANCZOS)
+            img.thumbnail((max_width, -1), resample=Image.LANCZOS)
             img.save(f"{name}.webp", 'webp', lossless=True)
             os.remove(image_path)
         # else keep min(jpg, webp), replace png
@@ -26,3 +24,12 @@ def convert_images_to_webm(images):
                 print(f"{'Replacing ':10}{image_path}")
                 os.remove(image_path)
 
+
+def rename_jpgs(path):
+    extensions = (".JPG", ".JPEG", ".jpeg")
+    bad_jpgs = [
+        os.path.join(root, name) for root, dirs, files in os.walk(path)
+        for name in files if name.endswith(extensions)
+    ]
+    for jpg in bad_jpgs:
+        os.rename(f"{jpg}", f"{os.path.splitext(jpg)[0]}.jpg")
